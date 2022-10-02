@@ -183,14 +183,13 @@ class BroadcastTo(TensorOp):
 
     def gradient(self, out_grad: Tensor, node: Tensor):
         ### BEGIN YOUR SOLUTION
-        shape = node.inputs[0].shape
-        j = 0
+        shape = list(node.inputs[0].shape) # (10, ) -> (2, 10)
         axes = []
+        shape = [1] * (len(self.shape) - len(shape)) + shape
         for i, s in enumerate(self.shape):
-            if j >= len(shape) or s != shape[j]:
+            if i >= len(shape) or s != shape[i]:
                 axes.append(i)
-            j += 1
-        return reshape(summation(out_grad, tuple(axes)), shape)
+        return reshape(summation(out_grad, tuple(axes)), node.inputs[0].shape)
         ### END YOUR SOLUTION
 
 
