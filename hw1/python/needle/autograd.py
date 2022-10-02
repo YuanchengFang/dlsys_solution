@@ -403,20 +403,14 @@ def compute_gradient_of_variables(output_tensor, out_grad):
         for t in node_to_output_grads_list[node][1:]:
             sum_grad = sum_grad + (t if type(t) == tuple else t)
         node.grad = sum_grad
-        if len(node.inputs) == 1:
-            next = node.inputs[0]
-            if next not in node_to_output_grads_list:
-                node_to_output_grads_list[next] = []
-            grad = node.op.gradient(node.grad, node)
-            grad = grad[0] if type(grad) == tuple else grad 
-            node_to_output_grads_list[next].append(grad)
-        else:
-            for i in range(len(node.inputs)):
-                next = node.inputs[i]
-                if next not in node_to_output_grads_list:
-                    node_to_output_grads_list[next] = []
-                grad = node.op.gradient(node.grad, node)[i]
-                node_to_output_grads_list[next].append(grad)
+        
+        if node.is_leaf():
+            continue
+        for i, grad in enumerate(node.op.gradient_as_tuple(node.grad, node)):
+            input_ =  node.inputs[i]
+            if input_ not in node_to_output_grads_list:
+                node_to_output_grads_list[input_] = []
+            node_to_output_grads_list[input_].append(grad)
     ### END YOUR SOLUTION
 
 

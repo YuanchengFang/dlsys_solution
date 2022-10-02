@@ -34,7 +34,9 @@ We need to implement postorder dfs in `find_topo_sort` function. There is anothe
 
 ### Gradient Computation
 
-My codes in this part seems a little bit redundant. There must exist a better solution.
+~~My codes in this part seems a little bit redundant. There must exist a better solution.~~
+
+*Update:* `op.gradient_as_tuple()` has helped me remove some redundant codes.
 
 ## Loss function & Training 
 
