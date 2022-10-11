@@ -1,5 +1,4 @@
 import sys
-from hw2.python.needle.nn import BatchNorm1d, LayerNorm1d
 sys.path.append('../python')
 import needle as ndl
 import needle.nn as nn
@@ -49,16 +48,26 @@ def epoch(dataloader, model, opt=None):
     np.random.seed(4)
     ### BEGIN YOUR SOLUTION
     loss_func = nn.SoftmaxLoss()
+    correct, loss_sum, n_step, n_samples= 0., 0., 0, 0
+    if opt:
+        model.train()
+    else:
+        model.eval()
     for X, y in dataloader:
-        if opt is not None:
+        if opt:
             opt.reset_grad()
         pred = model(X)
         loss = loss_func(pred, y)
-        acc = (pred.numpy().argmax(axis=1) == y.numpy()).sum() / pred.shape[0]
-        if opt is not None:
+        correct += (pred.numpy().argmax(axis=1) == y.numpy()).sum()
+        if opt:
             loss.backward()
             opt.step()
-    return acc, loss.numpy()
+        loss_sum += loss.numpy()
+        n_step += 1
+        n_samples += X.shape[0]
+    
+    # NOTE (1 - mean of acc over iterations) is not accurate enough
+    return (1 - correct / n_samples), loss_sum / n_step
     ### END YOUR SOLUTION
 
 
