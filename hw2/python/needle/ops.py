@@ -388,12 +388,16 @@ class LogSumExp(TensorOp):
     def compute(self, Z):
         ### BEGIN YOUR SOLUTION
         # keepdims!!!
-        z_max = array_api.max(Z, self.axes, keepdims=True)
-        z_exp = array_api.exp(Z - z_max)
-        z_sum = array_api.sum(z_exp, self.axes, keepdims=True)
-        result = array_api.log(z_sum) + z_max
-        result = array_api.squeeze(result)
-        return result
+        maxz = array_api.max(Z, axis=self.axes, keepdims=1)
+        ret = array_api.log(
+            array_api.exp(Z - maxz).sum(axis=self.axes, keepdims=1)) + maxz
+        # NOTE do not use squeeze, because it may remove the 1-size dimension in Z.shape
+        if self.axes:   
+            out_shape = [size for i, size in enumerate(Z.shape) if i not in self.axes]
+        else:
+            out_shape = ()
+        ret.resize(tuple(out_shape))
+        return ret
         ### END YOUR SOLUTION
 
     def gradient(self, out_grad, node):
