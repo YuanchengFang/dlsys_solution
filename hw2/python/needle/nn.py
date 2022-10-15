@@ -91,13 +91,19 @@ class Linear(Module):
         self.weight= Parameter(init.kaiming_uniform(in_features, out_features, requires_grad=True))
         # NOTE: this line below will change type(self.bias) from 'Parameter' into 'ndl.Tensor'!
         # self.bias = Parameter(init.kaiming_uniform(out_features, 1, requires_grad=True)).reshape((1, out_features))
-        self.bias = Parameter(init.kaiming_uniform(out_features, 1, requires_grad=True).reshape((1, out_features)))
+        if bias:
+            self.bias = Parameter(init.kaiming_uniform(out_features, 1, requires_grad=True).reshape((1, out_features)))
+        else:
+            self.bias = None
         ### END YOUR SOLUTION
 
     def forward(self, X: Tensor) -> Tensor:
         ### BEGIN YOUR SOLUTION
         X_mul_weight = X @ self.weight
-        return X_mul_weight + self.bias.broadcast_to(X_mul_weight.shape)
+        if self.bias:
+            return X_mul_weight + self.bias.broadcast_to(X_mul_weight.shape)
+        else:
+            return X_mul_weight
         ### END YOUR SOLUTION
 
 
@@ -135,8 +141,7 @@ class SoftmaxLoss(Module):
         exp_sum = ops.logsumexp(logits, axes=(1, )).sum()
         z_y_sum = (logits * init.one_hot(logits.shape[1], y)).sum()
         return (exp_sum - z_y_sum) / logits.shape[0]
-        ### END YOUR SOLUTION
-
+        # END YOUR SOLUTION
 
 
 class BatchNorm1d(Module):
@@ -214,8 +219,11 @@ class Dropout(Module):
         # NOTE Dropout is training only
         # NOTE 1 - self.p
         mask = init.randb(*x.shape, p=1 - self.p)
-        x_mask = x * mask
-        return x_mask / (1 - self.p)
+        if self.training:
+            x_mask = x * mask
+            return x_mask / (1 - self.p)
+        else:
+            return x
         ### END YOUR SOLUTION
 
 

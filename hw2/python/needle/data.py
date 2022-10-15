@@ -153,10 +153,13 @@ class MNISTDataset(Dataset):
         ### BEGIN YOUR SOLUTION
         X, y = self.images[index], self.labels[index]
         # NOTE: `self.transforms` need input shape like this.
-        X_in = X.reshape((28, 28, -1))
-        X_out = self.apply_transforms(X_in)
-        X_ret = X_out.reshape(-1, 28 * 28)
-        return X_ret, y
+        if self.transforms:
+            X_in = X.reshape((28, 28, -1))
+            X_out = self.apply_transforms(X_in)
+            X_ret = X_out.reshape(-1, 28 * 28)
+            return X_ret, y
+        else:
+            return X, y
         ### END YOUR SOLUTION
 
     def __len__(self) -> int:

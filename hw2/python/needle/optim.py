@@ -63,9 +63,6 @@ class Adam(Optimizer):
         self.m = {}
         self.v = {}
 
-        # TODO:
-        self.bias_correction = True
-
     def step(self):
         ### BEGIN YOUR SOLUTION
         self.t += 1
