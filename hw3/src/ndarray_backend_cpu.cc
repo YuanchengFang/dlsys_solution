@@ -10,7 +10,7 @@ namespace needle {
 namespace cpu {
 
 #define ALIGNMENT 256
-#define TILE 2
+#define TILE 8
 typedef float scalar_t;
 const size_t ELEM_SIZE = sizeof(scalar_t);
 
