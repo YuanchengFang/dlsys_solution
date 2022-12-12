@@ -374,6 +374,9 @@ def get_batch(batches, i, bptt, device=None, dtype=None):
     target - Tensor of shape (bptt*bs,) with cached data as NDArray
     """
     ### BEGIN YOUR SOLUTION
+    # NOTE: make sure `data` and `target` have same 
+    # seq_len when `i` nearly reach the end of `batches`
+    bptt = min(bptt, len(batches)-1-i)
     data = batches[i:i+bptt]
     target = batches[i+1:i+1+bptt]
     data = Tensor(data, device=device, dtype=dtype)
