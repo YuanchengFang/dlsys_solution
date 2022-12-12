@@ -128,22 +128,31 @@ def epoch_general_ptb(data, model, seq_len=40, loss_fn=nn.SoftmaxLoss(), opt=Non
     else:
         model.eval()
 
+    h = None
     for i in range(0, data.shape[0]-1, seq_len):
         X, y = ndl.data.get_batch(data, i, seq_len, device, dtype)
         if opt:
             opt.reset_grad()
-        pred, _ = model(X)
+        # NOTE: use
+        pred, h = model(X, h)
+        
+        if isinstance(h, tuple):
+            h = (h[0].detach(), h[1].detach())
+        else:
+            h = h.detach()
+        
         loss = loss_fn(pred, y)
         correct += (pred.numpy().argmax(axis=1) == y.numpy()).sum()
         if opt:
             loss.backward()
             opt.step()
-        loss_sum += loss.numpy()
+        # NOTE multiply seq_len
+        loss_sum += loss.numpy() * y.shape[0]
         n_step += 1
         n_samplers += y.shape[0]
 
 
-    return correct / n_samplers, loss_sum / n_step
+    return correct / n_samplers, loss_sum / n_samplers
     ### END YOUR SOLUTION
 
 
